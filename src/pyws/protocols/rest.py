@@ -54,7 +54,10 @@ class JsonProtocol(RestProtocol):
     name = 'json'
 
     def get_arguments(self, request, arguments):
-        try:
-            return json.loads(request.text)
-        except ValueError:
-            raise BadRequest()
+        if request.text:
+            try:
+                return json.loads(request.text)
+            except ValueError:
+                raise BadRequest()
+        else:
+            return {}
