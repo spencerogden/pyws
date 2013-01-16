@@ -53,9 +53,7 @@ class Server(object):
             DESTROY_CONTEXT=lambda x: None,
         )
 
-    def __init__(self, settings=None):
-        if not settings:
-            settings = {}
+    def __init__(self, settings={}):
         self.settings = self.gather_settings()
         self.settings.update(settings)
         if self.name in SERVERS:
