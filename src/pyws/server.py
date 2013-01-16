@@ -91,17 +91,17 @@ class Server(object):
         return self._protocols
 
     def get_protocol(self, request):
-
+        ### Extract the protocol name and alter the request to remove protocol. Returns a Protocol object.
         if not self.protocols:
             raise NoProtocolsRegistered()
-
+        
+        # If there is only one protocol, use it, otherwise take first part of URI
         if len(self.protocols) == 1:
-            name, tail = self.protocols.keys()[0], request.tail
+            name = self.protocols.keys()[0]
         else:
-            parts = request.tail.split('/', 1)
-            name, tail = parts[0], (len(parts) > 1 and parts[1] or '')
-            request.tail = tail
-
+            parts = request.tail.split('/', 1) + [""]
+            name, request.tail = parts[0], parts[1]
+            
         protocol = self.protocols.get(name)
 
         if not protocol:
