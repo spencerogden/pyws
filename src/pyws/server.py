@@ -169,7 +169,7 @@ class Server(object):
 
                 function = self.get_function(context, function, request.METHOD)
 
-                args = protocol.get_arguments(request, function.args)
+                args = protocol.get_arguments(request, function)
 
                 result = function(context, **args)
 
