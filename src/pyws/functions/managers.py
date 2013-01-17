@@ -51,11 +51,19 @@ class FixedFunctionManager(FunctionManager):
         if function.name in self.functions:
             raise FunctionAlreadyRegistered(function.name)
         self.functions[function.name] = function
+        
+        route_regex = re.compile(function.route)
+        name_regex  = re.compile('^' + function.name + '$')  
         for action in function.action:
-            regex = re.compile(function.route)
-            key = (regex,action)
+            key = (route_regex,action)
             if key in zip(*self.routes)[:1]:
                 raise RouteAlreadyRegistered(function.action + ":" + function.route)
+            else:
+                self.routes.append((key,function))
+             
+            key = (name_regex,action)
+            if key in zip(*self.routes)[:1]:
+                raise FunctionAlreadyRegistered(function.name)
             else:
                 self.routes.append((key,function))
 
