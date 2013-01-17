@@ -61,15 +61,14 @@ class FixedFunctionManager(FunctionManager):
             else:
                 self.routes.append((key,function))
 
-    def get_one(self, context, path):
+    def get_one(self, context, path, method="GET"):
         """
         Returns a function if it is registered, the context is ignored.
         """
-        action = "GET"
         found_func = None
-        for (re,act),func in self.routes:
+        for (re,key_method),func in self.routes:
             res = re.match(path)
-            if res and action == act:
+            if res and method == key_method:
                 found_func = func
                 break
         if found_func:

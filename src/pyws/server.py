@@ -122,10 +122,10 @@ class Server(object):
                 'Where have the default function manager gone?!')
         self.settings.FUNCTION_MANAGERS[0].add_function(function)
 
-    def get_function(self, context, name):
+    def get_function(self, context, name, method="GET"):
         for manager in self.settings.FUNCTION_MANAGERS:
             try:
-                return manager.get_one(context, name)
+                return manager.get_one(context, name, method)
             except FunctionNotFound:
                 pass
         raise FunctionNotFound(name)
@@ -167,7 +167,7 @@ class Server(object):
                 if callable(function):
                     return function(self, request, context)
 
-                function = self.get_function(context, function)
+                function = self.get_function(context, function, request.METHOD)
 
                 args = protocol.get_arguments(request, function.args)
 
