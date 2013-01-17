@@ -19,9 +19,11 @@ class Request(DefaultStrImplemntationMixin):
         self.GET = GET
         self.POST = POST
         self.COOKIES = COOKIES
+        self.METHOD = METHOD
 
     def __unicode__(self):
         return u"""<pyws.request.Request
+    METHOD: %s
     tail: %s
     GET: %s
     POST: %s
@@ -29,6 +31,7 @@ class Request(DefaultStrImplemntationMixin):
     text:
 %s
 >""" % (
+            self.METHOD,
             self.tail,
             self.GET,
             self.POST,
