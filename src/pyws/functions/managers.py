@@ -33,7 +33,6 @@ class FixedFunctionManager(FunctionManager):
         """
         ``functions`` is a list of functions to be registered.
         """
-        self.functions = {}
         self.routes = []
         for function in functions:
             self.add_function(function)
@@ -47,11 +46,6 @@ class FixedFunctionManager(FunctionManager):
         """
         Adds the function to the list of registered functions.
         """
-        function = self.build_function(function)
-        if function.name in self.functions:
-            raise FunctionAlreadyRegistered(function.name)
-        self.functions[function.name] = function
-        
         route_regex = re.compile(function.route)
         name_regex  = re.compile('^' + function.name + '$')  
         for action in function.action:
@@ -67,14 +61,21 @@ class FixedFunctionManager(FunctionManager):
             else:
                 self.routes.append((key,function))
 
-    def get_one(self, context, name):
+    def get_one(self, context, path):
         """
         Returns a function if it is registered, the context is ignored.
         """
-        try:
-            return self.functions[name]
-        except KeyError:
-            raise FunctionNotFound(name)
+        action = "GET"
+        found_func = None
+        for (re,act),func in self.routes:
+            res = re.match(path)
+            if res and action == act:
+                found_func = func
+                break
+        if found_func:
+            return found_func
+        else:
+            raise FunctionNotFound(path)
 
     def get_all(self, context):
         """
