@@ -7,7 +7,7 @@ class Request(DefaultStrImplemntationMixin):
     in the way that pyws could handle it.
     """
 
-    def __init__(self, tail, text, GET, POST, COOKIES):
+    def __init__(self, tail, text, GET, POST, COOKIES,METHOD="GET"):
         """
         ``tail`` is everything left from URL to which pyws server is attached.
         ``text`` is request text, ``GET``, ``POST`` and ``COOKIES`` are dicts
