@@ -54,11 +54,12 @@ class FixedFunctionManager(FunctionManager):
                 raise RouteAlreadyRegistered(function.action + ":" + function.route)
             else:
                 self.routes.append((key,function))
-             
+        for action in function.action + ("GET","POST") :
+            # Ensure that simple function names are always linked 
+            # to GET and POST for SOAP. But these come after any routes
+            # so under REST, they have lower precedence
             key = (name_regex,action)
-            if key in zip(*self.routes)[:1]:
-                raise FunctionAlreadyRegistered(function.name)
-            else:
+            if not key in zip(*self.routes)[:1]:
                 self.routes.append((key,function))
 
     def get_one(self, context, path, method="GET"):
@@ -78,6 +79,9 @@ class FixedFunctionManager(FunctionManager):
 
     def get_all(self, context):
         """
-        Returns a list of registered functions, the context is ignored.
+        Returns a unique list of registered functions, the context is ignored.
         """
-        return self.functions.values()
+        # A dense way to get a list of unique functions that have been registered
+        # with the new more flexible registering, a function with the same name 
+        # twise, each with different routes.
+        return list(set([r[1] for r in self.routes]))
