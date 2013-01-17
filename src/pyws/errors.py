@@ -60,6 +60,10 @@ class FunctionAlreadyRegistered(ConfigurationError):
     Function '%s' is already registered
     """
 
+class RouteAlreadyRegistered(ConfigurationError):
+    """
+    Route regex '%s' is already registered
+    """
 
 class BadFunction(ConfigurationError):
     """

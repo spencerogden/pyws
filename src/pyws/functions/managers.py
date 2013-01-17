@@ -2,6 +2,7 @@ from pyws.errors import BadFunction, FunctionNotFound,\
     FunctionAlreadyRegistered
 from pyws.functions import Function
 
+import re
 
 class FunctionManager(object):
 
@@ -33,6 +34,7 @@ class FixedFunctionManager(FunctionManager):
         ``functions`` is a list of functions to be registered.
         """
         self.functions = {}
+        self.routes = []
         for function in functions:
             self.add_function(function)
 
@@ -49,6 +51,13 @@ class FixedFunctionManager(FunctionManager):
         if function.name in self.functions:
             raise FunctionAlreadyRegistered(function.name)
         self.functions[function.name] = function
+        for action in function.action:
+            regex = re.compile(function.route)
+            key = (regex,action)
+            if key in zip(*self.routes)[:1]:
+                raise RouteAlreadyRegistered(function.action + ":" + function.route)
+            else:
+                self.routes.append((key,function))
 
     def get_one(self, context, name):
         """
