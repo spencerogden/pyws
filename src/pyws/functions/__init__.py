@@ -70,7 +70,8 @@ class NativeFunctionAdapter(Function):
 
     def __init__(
             self, origin,
-            name=None, return_type=str, args=None, needs_context=False):
+            name=None, return_type=str, args=None, needs_context=False,
+            route=None, action=("GET","POST","PUT","DELETE")):
         """
         ``origin`` is a native Python function to be wrapped.
         ``name`` is the name of the function, if it is not specified,
@@ -153,6 +154,11 @@ class NativeFunctionAdapter(Function):
         self.documentation = origin.__doc__
         self.return_type = TypeFactory(return_type or str)
         self.needs_context = needs_context
+        self.route = route or '^' + self.name + '$'
+        if isinstance(action,str):
+            self.action = (action,)
+        else:
+            self.action = tuple(action)
 
         # Get argument names from origin
         arg_names = [(x, ) for x in getargspec(origin)[0]
