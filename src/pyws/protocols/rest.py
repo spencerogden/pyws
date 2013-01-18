@@ -34,19 +34,27 @@ class RestProtocol(Protocol):
     def get_arguments(self, request, function):
         # Parameters in the path take precedence over values in the query string
         result = {}
-        regex = re.compile(function.route)
-        res = regex.match(request.tail)
+        
+        res = function.route_regex.match(request.tail)
+        name_dict = res.groupdict()
+
+        # span tuples are unique identifiers of groups
+        # index_dict should be all groups not in name_dict
+        index_dict = dict(enumerate(res.groups(),1))
+        index_dict = dict((i,value) for (i,value) 
+                        in dict(enumerate(res.groups(),1)) # dict of all groups
+                        if not res.span(i) in map(res.span,name_dict.keys()))
+
+        found_parameters = dict(name_dict.items() + index_dict.items())
+        # found_parameters should have all matched groups, keyed either by
+        # name or position
+
         for index,field in enumerate(function.args.fields):
-            try:
-                # try for a named group
-                value_from_path = res.group(field.name)
-            except IndexError:
-                # otherwise try positional
-                value_from_path = res.group(index+1)
-            value_from_query = request.GET.get(field.name)
-
-            value = [value_from_path,] or value_from_query
-
+            value_query_named = request.GET.get(field.name,None)
+            value_path_index = found_parameters.get(index,value_query_named)
+            value_path_named = found_parameters.get(field.name,value_path_index)
+            # Find the parameter in various locations, named in the path takes precedent
+            
             if issubclass(field.type, List):
                 result[field.name] = value
             elif value:
