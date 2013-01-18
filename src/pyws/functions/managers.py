@@ -67,4 +67,4 @@ class FixedFunctionManager(FunctionManager):
         """
         Returns a list of registered functions, the context is ignored.
         """
-        return self.functions.values()
+        return [f for (n,f) in self.functions.items() if not isinstance(n,Route)]
