@@ -41,6 +41,11 @@ class DefaultStrImplemntationMixin(object):
 
 class Route(str):
     def __new__(self,route,action="GET"):
+        route = route.lstrip('^')
+        route = route.rstrip('$')
+        return str.__new__(self,action + '_' + route)
+        
+    def __init__(self,route,action="GET"):
         if not action in ('GET','POST','PUT','DELETE'):
             raise ValueError("Invalid action: %" % action)
         route = route.lstrip('^')
@@ -48,6 +53,6 @@ class Route(str):
         self.route = '^' + action + '_' + route + '$'
         self.regex = re.compile(self.route)
         self.action = action
-        return str.__new__(self,action + '_' + route)
+
 
         
