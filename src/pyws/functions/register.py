@@ -37,11 +37,12 @@ def register(*args, **kwargs):
             'You might have tried to decorate a function directly with '
             '@register which is not supported, use @register(...) instead')
     def registrator(origin):
-        try:
-            server = SERVERS[kwargs.pop('to')]
-        except KeyError:
-            server = SERVERS.default
-        server.add_function(
-            NativeFunctionAdapter(origin, *args, **kwargs))
+        server = SERVERS.get(kwargs.pop('to',None),SERVERS.default)
+        names = kwargs.pop('name',*args[:1]) 
+        if isinstance(names,str):
+            names = [names]
+        for n in names:
+            server.add_function(
+                NativeFunctionAdapter(origin,n, *args[1:], **kwargs))
         return origin
     return registrator
