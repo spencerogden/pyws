@@ -1,7 +1,7 @@
 from pyws.errors import BadFunction, FunctionNotFound,\
     FunctionAlreadyRegistered
 from pyws.functions import Function
-
+from pyws.utils import Route
 
 class FunctionManager(object):
 
@@ -54,10 +54,14 @@ class FixedFunctionManager(FunctionManager):
         """
         Returns a function if it is registered, the context is ignored.
         """
-        try:
-            return self.functions[name]
-        except KeyError:
-            raise FunctionNotFound(name)
+        # name may be the simple name of a function, or the request.tail
+        for func_name,func in self.functions.items():
+            if isinstance(func_name,Route):
+                if func_name.regex.match(name):
+                    return func
+            elif func_name == name:
+                return func
+        raise FunctionNotFound(name)
 
     def get_all(self, context):
         """
