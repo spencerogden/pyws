@@ -1,6 +1,7 @@
 from datetime import date, datetime
 
 from functools import partial
+import re
 
 from pyws.errors import BadRequest
 from pyws.functions.args.types.complex import List
@@ -31,12 +32,24 @@ class RestProtocol(Protocol):
         return request.tail
 
     def get_arguments(self, request, function):
+        # Parameters in the path take precedence over values in the query string
         result = {}
-        for field in function.args.fields:
-            value = request.GET.get(field.name)
+        regex = re.compile(function.route)
+        res = regex.match(request.tail)
+        for index,field in enumerate(function.args.fields):
+            try:
+                # try for a named group
+                value_from_path = res.group(field.name)
+            except IndexError:
+                # otherwise try positional
+                value_from_path = res.group(index+1)
+            value_from_query = request.GET.get(field.name)
+
+            value = [value_from_path,] or value_from_query
+
             if issubclass(field.type, List):
                 result[field.name] = value
-            elif field.name in request.GET:
+            elif value:
                 result[field.name] = value[0]
         return result
 
@@ -54,10 +67,11 @@ class JsonProtocol(RestProtocol):
     name = 'json'
 
     def get_arguments(self, request, function):
+        # Parse args from path and query string, overwrite with JSON arguments if found
+        args = super(JsonProtocol,self).get_arguments()
         if request.text:
             try:
-                return json.loads(request.text)
+                args.update(json.loads(request.text))
             except ValueError:
                 raise BadRequest()
-        else:
-            return {}
+        return args
