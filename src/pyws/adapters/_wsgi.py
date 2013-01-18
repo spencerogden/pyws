@@ -43,7 +43,7 @@ def create_application(server, root_url):
                 post = parse_qs(text)
 
             response = server.process_request(
-                Request(tail, text, get, post, {}))
+                Request(tail, text, get, post, {},method))
 
             content_type = response.content_type
             status = get_http_response_code(response)
