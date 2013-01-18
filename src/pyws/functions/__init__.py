@@ -1,4 +1,5 @@
 from inspect import getargspec
+import re
 
 from pyws.functions.args import DictOf, TypeFactory
 from pyws.utils import cached_property
@@ -155,6 +156,7 @@ class NativeFunctionAdapter(Function):
         self.return_type = TypeFactory(return_type or str)
         self.needs_context = needs_context
         self.route = route or '^' + self.name + '$'
+        sel.route_regex = re.compile(self.route)
         if isinstance(action,str):
             self.action = (action,)
         else:
