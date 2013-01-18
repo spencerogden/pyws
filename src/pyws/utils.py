@@ -43,10 +43,9 @@ class Route(str):
     def __new__(self,route,action="GET"):
         if not action in ('GET','POST','PUT','DELETE'):
             raise ValueError("Invalid action: %" % action)
-        if route[0] != '^' and route[-1] != '$':
-            self.route = '^' + action + '_' + route + '$'
-        else:
-            self.route = route
+        route = route.lstrip('^')
+        route = route.rstrip('$')
+        self.route = '^' + action + '_' + route + '$'
         self.regex = re.compile(self.route)
         self.action = action
         return str.__new__(self,action + '_' + route)
