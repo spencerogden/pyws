@@ -218,8 +218,8 @@ class SoapProtocol(Protocol):
 
         return self.parse_request(request).func_name
 
-    def get_arguments(self, request, arguments):
-        return xml2obj(self.parse_request(request).func_xml, arguments) or {}
+    def get_arguments(self, request, function):
+        return xml2obj(self.parse_request(request).func_xml, function.args) or {}
 
     def get_response(self, result, name, return_type):
 

@@ -30,9 +30,9 @@ class RestProtocol(Protocol):
     def get_function(self, request):
         return Route(request.tail,request.METHOD)
 
-    def get_arguments(self, request, arguments):
+    def get_arguments(self, request, function):
         result = {}
-        for field in arguments.fields:
+        for field in function.args.fields:
             value = request.GET.get(field.name)
             if issubclass(field.type, List):
                 result[field.name] = value
@@ -53,7 +53,7 @@ class JsonProtocol(RestProtocol):
 
     name = 'json'
 
-    def get_arguments(self, request, arguments):
+    def get_arguments(self, request, function):
         try:
             return json.loads(request.text)
         except ValueError:

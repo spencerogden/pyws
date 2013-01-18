@@ -29,7 +29,7 @@ class Protocol(object):
         """
         raise NotImplementedError('Protocol.get_function')
 
-    def get_arguments(self, request, arguments):
+    def get_arguments(self, request, function):
         """
         Extracts argument values from the request according to the arguments
         specification.
