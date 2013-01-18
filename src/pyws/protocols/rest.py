@@ -5,7 +5,7 @@ from functools import partial
 from pyws.errors import BadRequest
 from pyws.functions.args.types.complex import List
 from pyws.response import Response
-from pyws.utils import json
+from pyws.utils import json,Route
 from pyws.protocols.base import Protocol
 
 __all__ = ('RestProtocol', 'JsonProtocol', )
@@ -28,7 +28,7 @@ class RestProtocol(Protocol):
     name = 'rest'
 
     def get_function(self, request):
-        return request.tail
+        return Route(request.tail,request.METHOD)
 
     def get_arguments(self, request, arguments):
         result = {}
