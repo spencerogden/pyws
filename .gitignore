@@ -9,4 +9,3 @@
 *.idea
 dist
 *.egg-info
-example.py
