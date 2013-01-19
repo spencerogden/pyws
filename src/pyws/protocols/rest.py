@@ -32,11 +32,26 @@ class RestProtocol(Protocol):
 
     def get_arguments(self, request, function):
         result = {}
-        for field in function.args.fields:
-            value = request.GET.get(field.name)
+        name_dict = {}
+        index_dict = {}
+        if isinstance(function.name,Route):
+            m = function.name.regex.match(Route(request.tail,request.METHOD))
+            name_dict = m.groupdict()
+            index_dict = dict((i,value) for (i,value)
+                                in dict(enumerate(m.groups(),1)).items() # numbered dict of all groups
+                                if not m.span(i) in map(m.span,name_dict.keys()))
+        path_params = dict(name_dict.items() + index_dict.items())
+
+        for index,field in enumerate(function.args.fields):
+            value = request.GET.get(field.name,None)
+            value = path_params.get(index     ,value)
+            value = path_params.get(field.name,value)
+            if not type(value) in (list,tuple):
+                value = (value,)
+
             if issubclass(field.type, List):
                 result[field.name] = value
-            elif field.name in request.GET:
+            elif value != (None,):
                 result[field.name] = value[0]
         return result
 
